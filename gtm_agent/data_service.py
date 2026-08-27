@@ -12,11 +12,13 @@ from langsmith import traceable
 
 from .gtm_records import OFFERINGS, PROSPECTS, REP_IDS
 
+SENSITIVE_FIELDS = ("billing_qualification",)
+
 __all__ = [
     "get_offering", "get_prospect_record", "update_prospect_info",
     "fetch_engagement_history", "fetch_account_details", "fetch_tech_stack",
     "get_profile_from_db", "save_profile_to_db",
-    "get_rep",
+    "get_rep", "redact",
 ]
 
 # Built prospect profiles are cached in memory (keyed by prospect_id) so repeat
@@ -26,6 +28,11 @@ _PROFILES = {}
 # ---------------------------------------------------------------------------
 # Public data-access functions
 # ---------------------------------------------------------------------------
+def redact(record):
+    "Return a copy of a record without sensitive fields."
+    return {key: value for key, value in record.items() if key not in SENSITIVE_FIELDS}
+
+
 def get_offering(offering_id):
     "Return the offering record for offering_id from the CRM, or None if not found."
     return OFFERINGS.get(offering_id)
